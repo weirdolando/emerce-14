@@ -36,7 +36,7 @@ async function register(req, res) {
   const { email, password, phone, firstName, lastName, username } = req.body;
 
   if (!email || !password || !phone || !firstName || !lastName || !username) {
-    return res.status(400).json({ message: "Required field cannot be empty" });
+    return res.status(400).json({ error: "Required field cannot be empty" });
   }
 
   const saltRounds = bcrypt.genSaltSync(10);
@@ -75,7 +75,7 @@ async function register(req, res) {
         userProfileId,
       ]);
     await db.promise().query("COMMIT");
-    res.json({
+    res.status(201).json({
       message: "User successfully registered",
       data: {
         username,
@@ -88,7 +88,7 @@ async function register(req, res) {
   } catch (err) {
     await db.promise().query("ROLLBACK");
     console.log(err.sqlMessage);
-    return res.status(400).json({ message: err.sqlMessage });
+    return res.status(400).json({ error: err.sqlMessage });
   }
 }
 
