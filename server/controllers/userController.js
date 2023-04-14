@@ -9,10 +9,7 @@ async function auth(req, res) {
   try {
     const [user] = await db
       .promise()
-      .query(
-        "SELECT id, username, email, password FROM users WHERE email = ?",
-        [email]
-      );
+      .query("SELECT * FROM users WHERE email = ?", email);
     if (!user.length)
       return res.status(401).json({ error: "Email is not registered" });
     const isValid = bcrypt.compareSync(password, user[0].password);
@@ -27,7 +24,7 @@ async function auth(req, res) {
       token,
     });
   } catch (err) {
-    console.log(err.sqlMessage);
+    console.log(err.message);
     return res.status(400).json({ error: err.message });
   }
 }
@@ -61,12 +58,12 @@ async function register(req, res) {
     await db
       .promise()
       .query(
-        "INSERT INTO user_profiles (user_id, firstName, lastName) VALUES(?, ?, ?)",
+        "INSERT INTO user_profiles (user_id, firstname, lastname) VALUES(?, ?, ?)",
         [userId, firstName, lastName]
       );
     const [userProfile] = await db
       .promise()
-      .query("SELECT id FROM user_profiles WHERE user_id = ?", [userId]);
+      .query("SELECT id FROM user_profiles WHERE user_id = ?", userId);
     const userProfileId = userProfile[0].id;
     await db
       .promise()
@@ -87,8 +84,8 @@ async function register(req, res) {
     });
   } catch (err) {
     await db.promise().query("ROLLBACK");
-    console.log(err.sqlMessage);
-    return res.status(400).json({ error: err.sqlMessage });
+    console.log(err.message);
+    return res.status(400).json({ error: err.message });
   }
 }
 
@@ -108,7 +105,7 @@ async function keepLogin(req, res) {
     const [userProfile] = await db
       .promise()
       .query(
-        "SELECT first_name, last_name FROM user_profiles WHERE user_id = ?",
+        "SELECT firstname, lastname FROM user_profiles WHERE user_id = ?",
         user[0].id
       );
     return res.status(200).json({
