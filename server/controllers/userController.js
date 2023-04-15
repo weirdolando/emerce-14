@@ -30,9 +30,9 @@ async function auth(req, res) {
 }
 
 async function register(req, res) {
-  const { email, password, phone, firstName, lastName, username } = req.body;
+  const { email, password, phone, firstname, lastname, username } = req.body;
 
-  if (!email || !password || !phone || !firstName || !lastName || !username) {
+  if (!email || !password || !phone || !firstname || !lastname || !username) {
     return res.status(400).json({ error: "Required field cannot be empty" });
   }
 
@@ -59,7 +59,7 @@ async function register(req, res) {
       .promise()
       .query(
         "INSERT INTO user_profiles (user_id, firstname, lastname) VALUES(?, ?, ?)",
-        [userId, firstName, lastName]
+        [userId, firstname, lastname]
       );
     const [userProfile] = await db
       .promise()
@@ -78,8 +78,8 @@ async function register(req, res) {
         username,
         email,
         phone,
-        firstName,
-        lastName,
+        firstname,
+        lastname,
       },
     });
   } catch (err) {
