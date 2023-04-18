@@ -3,8 +3,10 @@ const express = require("express");
 const cors = require("cors");
 
 const db = require("./config/db");
-const { userRouter } = require("./routes");
 const PORT = process.env.PORT;
+
+const { userRouter } = require("./routers");
+const { productRouter } = require("./routers");
 
 db.connect((err) => {
   if (err) return console.error(err);
@@ -14,6 +16,8 @@ db.connect((err) => {
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+app.use("/product", productRouter);
 
 app.use("/user", userRouter);
 
