@@ -10,9 +10,9 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
-import axios from "axios";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import userHelper from "../helper/user";
 
 const RegisterForm = () => {
   const navigate = useNavigate();
@@ -28,10 +28,9 @@ const RegisterForm = () => {
           password: "",
         }}
         onSubmit={(values) => {
-          axios
-            .post("http://localhost:2000/user/auth", values)
-            .then((res) => {
-              localStorage.setItem("emerce14-token", res.data.token);
+          userHelper
+            .loginUserAsync(values)
+            .then(() => {
               navigate("/");
             })
             .catch((err) => {

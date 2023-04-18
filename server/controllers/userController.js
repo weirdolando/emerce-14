@@ -16,7 +16,7 @@ async function auth(req, res) {
     if (!isValid) return res.status(401).json({ error: "Password incorrect" });
     // !FIXME: Change expires to a longer time in production
     const token = jwt.sign({ id: user[0].id }, process.env.SECRET, {
-      expiresIn: "5m",
+      expiresIn: "5s",
     });
     return res.status(200).json({
       message: "Login success",

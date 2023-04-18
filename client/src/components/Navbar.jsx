@@ -4,14 +4,24 @@ import {
   Text,
   IconButton,
   Button,
+  HStack,
+  VStack,
   Stack,
+  Avatar,
+  Menu,
+  MenuItem,
+  MenuButton,
+  MenuList,
+  MenuDivider,
   Collapse,
   Icon,
   Link,
+  Input,
+  InputGroup,
+  InputLeftElement,
   Popover,
   PopoverTrigger,
   PopoverContent,
-  useColorModeValue,
   useBreakpointValue,
   useDisclosure,
 } from "@chakra-ui/react";
@@ -20,30 +30,40 @@ import {
   CloseIcon,
   ChevronDownIcon,
   ChevronRightIcon,
+  SearchIcon,
 } from "@chakra-ui/icons";
 import { Link as RLink } from "react-router-dom";
+import { AiOutlineShoppingCart } from "react-icons/ai";
+import { FiChevronDown } from "react-icons/fi";
+import { useSelector, useDispatch } from "react-redux";
+import { removeCurrUser } from "../reducers/userSlice";
+import { useNavigate } from "react-router-dom";
 
 export default function Navbar() {
   const { isOpen, onToggle } = useDisclosure();
+  const user = useSelector((state) => state.user.currUser);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const logout = () => {
+    dispatch(removeCurrUser());
+    navigate("/login");
+  };
 
   return (
     <Box>
       <Flex
-        bg={useColorModeValue("white", "gray.800")}
-        color={useColorModeValue("gray.600", "white")}
+        bg="white"
+        color="gray.600"
         minH={"60px"}
         py={{ base: 2 }}
         px={{ base: 4 }}
         borderBottom={1}
         borderStyle={"solid"}
-        borderColor={useColorModeValue("gray.200", "gray.900")}
+        borderColor="gray.200"
         align={"center"}
       >
-        <Flex
-          flex={{ base: 1, md: "auto" }}
-          ml={{ base: -2 }}
-          display={{ base: "flex", md: "none" }}
-        >
+        <Flex ml={{ base: -2 }} display={{ base: "flex", md: "none" }}>
           <IconButton
             onClick={onToggle}
             icon={
@@ -53,51 +73,65 @@ export default function Navbar() {
             aria-label={"Toggle Navigation"}
           />
         </Flex>
-        <Flex flex={{ base: 1 }} justify={{ base: "center", md: "start" }}>
+        <Flex
+          flex={{ base: 1 }}
+          justify={{ base: "center", md: "start" }}
+          align="center"
+        >
           <Text
+            as={RLink}
             textAlign={useBreakpointValue({ base: "center", md: "left" })}
             fontFamily={"heading"}
-            color={useColorModeValue("gray.800", "white")}
+            color="pink.400"
+            fontSize="2xl"
+            fontWeight={600}
+            display={{ base: "none", md: "inline-flex" }}
+            to="/"
           >
-            Logo
+            tukupedia
           </Text>
 
-          <Flex display={{ base: "none", md: "flex" }} ml={10}>
-            <DesktopNav />
+          <Flex ml={10} grow={1}>
+            <DesktopNav user={user} onLogout={logout} />
           </Flex>
         </Flex>
 
-        <Stack
-          flex={{ base: 1, md: 0 }}
-          justify={"flex-end"}
-          direction={"row"}
-          spacing={6}
-        >
-          <Button
-            as={RLink}
-            fontSize={"sm"}
-            fontWeight={400}
-            variant={"link"}
-            to="/login"
-          >
-            Log in
-          </Button>
-
-          <Button
-            as={RLink}
+        {!user.id && (
+          <Stack
+            flex={{ base: 1, md: 0 }}
+            justify={"flex-end"}
+            align="center"
+            direction={"row"}
+            spacing={6}
             display={{ base: "none", md: "inline-flex" }}
-            fontSize={"sm"}
-            fontWeight={600}
-            color={"white"}
-            bg={"pink.400"}
-            _hover={{
-              bg: "pink.300",
-            }}
-            to="/register"
           >
-            Register
-          </Button>
-        </Stack>
+            <Box color="gray.400">|</Box>
+            <Button
+              as={RLink}
+              fontSize={"sm"}
+              fontWeight={400}
+              variant={"link"}
+              to="/login"
+            >
+              Log in
+            </Button>
+
+            <Button
+              as={RLink}
+              display={{ base: "none", md: "inline-flex" }}
+              fontSize={"sm"}
+              fontWeight={600}
+              color={"white"}
+              bg={"pink.400"}
+              _hover={{
+                bg: "pink.300",
+              }}
+              to="/register"
+            >
+              Register
+            </Button>
+          </Stack>
+        )}
       </Flex>
 
       <Collapse in={isOpen} animateOpacity>
@@ -107,52 +141,149 @@ export default function Navbar() {
   );
 }
 
-const DesktopNav = () => {
-  const linkColor = useColorModeValue("gray.600", "gray.200");
-  const linkHoverColor = useColorModeValue("gray.800", "white");
-  const popoverContentBgColor = useColorModeValue("white", "gray.800");
+const DesktopNav = ({ user = {}, onLogout }) => {
+  const linkColor = "gray.600";
+  const linkHoverColor = "gray.800";
+  const popoverContentBgColor = "white";
 
   return (
-    <Stack direction={"row"} spacing={4}>
+    <Flex align="center" gap={4} w="100%">
       {NAV_ITEMS.map((navItem) => (
-        <Box key={navItem.label}>
-          <Popover trigger={"hover"} placement={"bottom-start"}>
-            <PopoverTrigger>
-              <Link
-                p={2}
-                href={navItem.href ?? "#"}
-                fontSize={"sm"}
-                fontWeight={500}
-                color={linkColor}
-                _hover={{
-                  textDecoration: "none",
-                  color: linkHoverColor,
-                }}
-              >
-                {navItem.label}
-              </Link>
-            </PopoverTrigger>
+        <Box
+          key={navItem.label}
+          w={navItem.type === "search" && "100%"}
+          display={
+            (navItem.type === "category" || navItem.type === "cart") && {
+              base: "none",
+              md: "inline-flex",
+            }
+          }
+        >
+          {navItem.type === "category" ? (
+            <Popover trigger={"hover"} placement={"bottom-start"}>
+              <PopoverTrigger>
+                <RLink
+                  p={2}
+                  to={navItem.href ?? "#"}
+                  fontSize={"sm"}
+                  fontWeight={500}
+                  color={linkColor}
+                  _hover={{
+                    textDecoration: "none",
+                    color: linkHoverColor,
+                  }}
+                >
+                  {navItem.label}
+                </RLink>
+              </PopoverTrigger>
 
-            {navItem.children && (
-              <PopoverContent
-                border={0}
-                boxShadow={"xl"}
-                bg={popoverContentBgColor}
-                p={4}
-                rounded={"xl"}
-                minW={"sm"}
-              >
-                <Stack>
+              {navItem.children && (
+                <PopoverContent
+                  border={0}
+                  boxShadow={"xl"}
+                  bg={popoverContentBgColor}
+                  p={4}
+                  rounded={"xl"}
+                  minW={"sm"}
+                >
+                  <Stack>
+                    {navItem.children.map((child) => (
+                      <DesktopSubNav key={child.label} {...child} />
+                    ))}
+                  </Stack>
+                </PopoverContent>
+              )}
+            </Popover>
+          ) : navItem.type === "cart" ? (
+            <Menu>
+              <MenuButton
+                as={IconButton}
+                icon={<AiOutlineShoppingCart />}
+                py={2}
+                transition="all 0.3s"
+                _focus={{ boxShadow: "none" }}
+              />
+              {navItem.children && (
+                <MenuList bg="white" borderColor="gray.200">
                   {navItem.children.map((child) => (
-                    <DesktopSubNav key={child.label} {...child} />
+                    <MenuItem
+                      key={child.label}
+                      href={child.href ? child.href : "#"}
+                    >
+                      {child.label}
+                    </MenuItem>
                   ))}
-                </Stack>
-              </PopoverContent>
-            )}
-          </Popover>
+                  <MenuDivider />
+                  <MenuItem>See cart</MenuItem>
+                </MenuList>
+              )}
+            </Menu>
+          ) : navItem.type === "search" ? (
+            <Box>
+              <InputGroup>
+                <InputLeftElement
+                  pointerEvents="none"
+                  children={<SearchIcon color="gray.300" />}
+                />
+                <Input type="text" placeholder="Search in tukupedia" />
+              </InputGroup>
+            </Box>
+          ) : navItem.type === "account" && user.id ? (
+            <Flex alignItems={"center"} ml={4}>
+              <Menu>
+                <MenuButton
+                  py={2}
+                  transition="all 0.3s"
+                  _focus={{ boxShadow: "none" }}
+                >
+                  <HStack>
+                    <Avatar
+                      size={"sm"}
+                      src={
+                        "https://www.punchstick.com/wp-content/uploads/2017/12/default-user-image-300x300.png"
+                      }
+                    />
+                    <VStack
+                      display="flex"
+                      alignItems="flex-start"
+                      spacing="1px"
+                      ml="2"
+                    >
+                      <Text
+                        fontSize="sm"
+                        maxW="50px"
+                        overflow="hidden"
+                        textOverflow="ellipsis"
+                        whiteSpace="nowrap"
+                      >
+                        {user.firstname}
+                      </Text>
+                    </VStack>
+                    <Box display="flex">
+                      <FiChevronDown />
+                    </Box>
+                  </HStack>
+                </MenuButton>
+                {navItem.children && (
+                  <MenuList bg="white" borderColor="gray.200">
+                    {navItem.children.map((child) => (
+                      <MenuItem
+                        key={child.label}
+                        href={child.href ? child.href : "#"}
+                      >
+                        {child.label}
+                      </MenuItem>
+                    ))}
+                    <MenuDivider />
+                    <MenuItem onClick={onLogout}>Sign Out</MenuItem>
+                  </MenuList>
+                )}
+              </Menu>
+            </Flex>
+          ) : null}
         </Box>
       ))}
-    </Stack>
+    </Flex>
   );
 };
 
@@ -164,7 +295,7 @@ const DesktopSubNav = ({ label, href, subLabel }) => {
       display={"block"}
       p={2}
       rounded={"md"}
-      _hover={{ bg: useColorModeValue("pink.50", "gray.900") }}
+      _hover={{ bg: "pink.50" }}
     >
       <Stack direction={"row"} align={"center"}>
         <Box>
@@ -195,20 +326,22 @@ const DesktopSubNav = ({ label, href, subLabel }) => {
 
 const MobileNav = () => {
   return (
-    <Stack
-      bg={useColorModeValue("white", "gray.800")}
-      p={4}
-      display={{ md: "none" }}
-    >
-      {NAV_ITEMS.map((navItem) => (
-        <MobileNavItem key={navItem.label} {...navItem} />
-      ))}
+    <Stack bg="white" p={4} display={{ md: "none" }}>
+      {NAV_ITEMS.map((navItem) => {
+        return (
+          navItem.mobile !== "none" && (
+            <MobileNavItem key={navItem.label} {...navItem} />
+          )
+        );
+      })}
     </Stack>
   );
 };
 
-const MobileNavItem = ({ label, children, href }) => {
+const MobileNavItem = ({ label, children, href, mobileItem }) => {
   const { isOpen, onToggle } = useDisclosure();
+
+  const hideMobileItem = mobileItem === "none";
 
   return (
     <Stack spacing={4} onClick={children && onToggle}>
@@ -222,13 +355,10 @@ const MobileNavItem = ({ label, children, href }) => {
           textDecoration: "none",
         }}
       >
-        <Text
-          fontWeight={600}
-          color={useColorModeValue("gray.600", "gray.200")}
-        >
+        <Text fontWeight={600} color="gray.600">
           {label}
         </Text>
-        {children && (
+        {children && !hideMobileItem && (
           <Icon
             as={ChevronDownIcon}
             transition={"all .25s ease-in-out"}
@@ -239,64 +369,83 @@ const MobileNavItem = ({ label, children, href }) => {
         )}
       </Flex>
 
-      <Collapse in={isOpen} animateOpacity style={{ marginTop: "0!important" }}>
-        <Stack
-          mt={2}
-          pl={4}
-          borderLeft={1}
-          borderStyle={"solid"}
-          borderColor={useColorModeValue("gray.200", "gray.700")}
-          align={"start"}
+      {!hideMobileItem && (
+        <Collapse
+          in={isOpen}
+          animateOpacity
+          style={{ marginTop: "0!important" }}
         >
-          {children &&
-            children.map((child) => (
-              <Link key={child.label} py={2} href={child.href}>
-                {child.label}
-              </Link>
-            ))}
-        </Stack>
-      </Collapse>
+          <Stack
+            mt={2}
+            pl={4}
+            borderLeft={1}
+            borderStyle={"solid"}
+            borderColor="gray.200"
+            align={"start"}
+          >
+            {children &&
+              children.map((child) => (
+                <Link key={child.label} py={2} href={child.href}>
+                  {child.label}
+                </Link>
+              ))}
+          </Stack>
+        </Collapse>
+      )}
     </Stack>
   );
 };
 
 const NAV_ITEMS = [
   {
-    label: "Inspiration",
+    label: "Categories",
+    type: "category",
     children: [
       {
-        label: "Explore Design Work",
-        subLabel: "Trending Design to inspire you",
+        label: "Fashion",
+        subLabel: "Clothes, Dresses, Shoes, and more",
         href: "#",
       },
       {
-        label: "New & Noteworthy",
-        subLabel: "Up-and-coming Designers",
+        label: "Electronics",
+        subLabel: "Phones, TV, Laptop, and more",
+        href: "#",
+      },
+      {
+        label: "Furniture",
+        subLabel: "Chairs, Tables, Sofa, and more",
         href: "#",
       },
     ],
   },
   {
-    label: "Find Work",
+    label: "Search",
+    type: "search",
+    mobile: "none",
+  },
+  {
+    label: "Cart",
+    type: "cart",
+    mobileItem: "none",
+    children: [],
+  },
+  {
+    label: "Account",
+    type: "account",
+    mobile: "none",
     children: [
       {
-        label: "Job Board",
-        subLabel: "Find your dream design job",
+        label: "Profile",
         href: "#",
       },
       {
-        label: "Freelance Projects",
-        subLabel: "An exclusive list for contract work",
+        label: "Store",
+        href: "#",
+      },
+      {
+        label: "Order History",
         href: "#",
       },
     ],
-  },
-  {
-    label: "Learn Design",
-    href: "#",
-  },
-  {
-    label: "Hire Designers",
-    href: "#",
   },
 ];

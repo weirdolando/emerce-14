@@ -15,9 +15,9 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
-import axios from "axios";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import userHelper from "../helper/user";
 
 YupPassword(Yup);
 
@@ -51,13 +51,13 @@ const RegisterForm = () => {
         }}
         validationSchema={RegisterSchema}
         onSubmit={(values) => {
-          axios
-            .post("http://localhost:2000/user/register", values)
+          userHelper
+            .registerUserAsync(values)
             .then((res) => {
               Swal.fire({
-                position: "middle",
+                position: "center",
                 icon: "success",
-                title: res.data.message,
+                title: res.message,
                 showConfirmButton: false,
                 timer: 1500,
               });
