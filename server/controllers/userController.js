@@ -16,7 +16,7 @@ async function auth(req, res) {
     if (!isValid) return res.status(401).json({ error: "Password incorrect" });
     // !FIXME: Change expires to a longer time in production
     const token = jwt.sign({ id: user[0].id }, process.env.SECRET, {
-      expiresIn: "5s",
+      expiresIn: "1h",
     });
     return res.status(200).json({
       message: "Login success",
@@ -90,31 +90,10 @@ async function register(req, res) {
 }
 
 async function keepLogin(req, res) {
-  const auth = req.get("authorization");
-  if (!auth) return res.status(401).json({ error: "Missing token" });
-  const token = auth.split(" ")[1];
-  try {
-    const decodedToken = jwt.verify(token, process.env.SECRET);
-    if (!decodedToken) return res.status(401).json({ error: "Invalid token" });
-    const [user] = await db
-      .promise()
-      .query(
-        "SELECT id, username, email FROM users WHERE id = ?",
-        decodedToken.id
-      );
-    const [userProfile] = await db
-      .promise()
-      .query(
-        "SELECT firstname, lastname FROM user_profiles WHERE user_id = ?",
-        user[0].id
-      );
-    return res.status(200).json({
-      message: "Authenticated",
-      data: { ...user[0], ...userProfile[0] },
-    });
-  } catch (err) {
-    return res.status(400).json({ error: err.message });
-  }
+  return res.status(200).json({
+    message: "Authenticated",
+    data: req.user,
+  });
 }
 
 module.exports = { auth, register, keepLogin };
