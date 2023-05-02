@@ -10,6 +10,8 @@ import {
 import { BsStar, BsStarFill, BsStarHalf } from "react-icons/bs";
 import { FiShoppingCart } from "react-icons/fi";
 import { Link } from "react-router-dom";
+import { postCartItems } from "../reducers/cartSlice";
+import { useDispatch } from "react-redux";
 
 function Rating({ rating, numReviews }) {
   rating = (Math.random() * (5 - 4) + 4).toFixed(1);
@@ -43,6 +45,13 @@ function Rating({ rating, numReviews }) {
 }
 
 function ProductCart({ product = {}, idx = 0, page = "product" }) {
+  const dispatch = useDispatch();
+
+  function handleAddCart(e) {
+    e.preventDefault();
+    dispatch(postCartItems(product.id));
+  }
+
   return (
     <Box
       bg="white"
@@ -110,6 +119,7 @@ function ProductCart({ product = {}, idx = 0, page = "product" }) {
               size="lg"
               aria-label="Add to cart"
               variant="ghost"
+              onClick={handleAddCart}
               icon={<FiShoppingCart />}
             />
           </Tooltip>

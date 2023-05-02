@@ -31,6 +31,14 @@ async function addCartProduct(req, res) {
     return res.status(400).json({ error: "Required field cannot be empty" });
 
   try {
+    const [product] = await db
+      .promise()
+      .query("SELECT stock, is_active FROM products WHERE id = ?", productId);
+    if (!product.length)
+      return res.status(404).json({ error: "Product not found" });
+    if (!product[0]["is_active"] || product[0].stock <= 0)
+      return res.status(400).json({ error: "Product out of stock / deleted" });
+
     const [userCart] = await db
       .promise()
       .query(
@@ -86,6 +94,18 @@ async function editCartProduct(req, res) {
     return res.status(400).json({ error: "Required field cannot be empty" });
 
   try {
+    const [product] = await db
+      .promise()
+      .query("SELECT stock, is_active FROM products WHERE id = ?", productId);
+    if (!product.length)
+      return res.status(404).json({ error: "Product not found" });
+    if (
+      !product[0]["is_active"] ||
+      product[0].stock <= 0 ||
+      qty > product[0].stock
+    )
+      return res.status(400).json({ error: "Product out of stock / deleted" });
+
     const [userCart] = await db
       .promise()
       .query(
@@ -117,7 +137,7 @@ async function editCartProduct(req, res) {
 
 async function deleteCartProduct(req, res) {
   const userId = req.user.id;
-  const productId = req.body.id;
+  const productId = req.params.id;
   if (!userId || !productId)
     return res.status(400).json({ error: "Required field cannot be empty" });
 

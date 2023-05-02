@@ -4,6 +4,7 @@ import RegisterLogin from "./pages/RegisterLogin";
 import RequireAuth from "./components/RequireAuth";
 import Home from "./pages/Home";
 import ProductDetailPage from "./pages/ProductDetailPage";
+import CartDetailPage from "./pages/CartDetailPage";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
             </RequireAuth>
           }
         />
+        <Route path="/cart" element={<CartDetailPage />} />
       </Routes>
     </div>
   );

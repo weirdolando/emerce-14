@@ -57,11 +57,15 @@ function Hero({
         alignItems={"center"}
         gap={4}
       >
-        {product.products.map((product, idx) => (
-          <GridItem key={product.id}>
-            <ProductCard product={product} idx={idx} />
-          </GridItem>
-        ))}
+        {product.products.map((product, idx) => {
+          return (
+            product["is_active"] && (
+              <GridItem key={product.id}>
+                <ProductCard product={product} idx={idx} />
+              </GridItem>
+            )
+          );
+        })}
       </Grid>
       {/* TODO: what if there are 100 pages? Make the pagination only shows 10 max at once  */}
       <Stack direction="row" spacing={2} my={8} align="center" justify="center">

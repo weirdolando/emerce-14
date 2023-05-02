@@ -1,6 +1,7 @@
 import {
   Box,
   Container,
+  HStack,
   Stack,
   Text,
   Image,
@@ -17,10 +18,13 @@ import { MdLocalShipping } from "react-icons/md";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { postCartItems } from "../reducers/cartSlice";
 
 export default function ProductDetail() {
   const [product, setProduct] = useState({});
   const id = useParams().id;
+  const dispatch = useDispatch();
 
   useEffect(() => {
     axios
@@ -40,6 +44,7 @@ export default function ProductDetail() {
 
   // Get product description whether it's an array or a string
   const productDescription = parseJsonOrString(product.description);
+  console.log(product);
 
   return (
     <Container maxW={"7xl"}>
@@ -98,6 +103,10 @@ export default function ProductDetail() {
                   ))
                 )}
               </UnorderedList>
+              <HStack spacing={8} mt={8}>
+                <Text fontWeight={500}>Stock: {product.stock}</Text>
+                <Text fontWeight={500}>Sold: {product.sold}</Text>
+              </HStack>
             </Box>
             {/* TODO: Add store maybe? if the backend is done or I'm not lazy lol */}
             <Box>
@@ -138,6 +147,8 @@ export default function ProductDetail() {
               transform: "translateY(2px)",
               boxShadow: "lg",
             }}
+            isDisabled={product.stock <= 0}
+            onClick={() => dispatch(postCartItems(product.id))}
           >
             Add to cart
           </Button>
