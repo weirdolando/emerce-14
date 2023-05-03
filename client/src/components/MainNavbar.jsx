@@ -40,8 +40,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { removeCurrUser } from "../reducers/userSlice";
 import { fetchProducts } from "../reducers/productSlice";
-import { fetchCartItems } from "../reducers/cartSlice";
 import { useEffect } from "react";
+import { fetchCartItems } from "../reducers/cartSlice";
 
 export default function MainNavbar({ filterName, onChange }) {
   const { isOpen, onToggle } = useDisclosure();
@@ -49,9 +49,21 @@ export default function MainNavbar({ filterName, onChange }) {
   const cart = useSelector((state) => state.cart);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   useEffect(() => {
-    dispatch(fetchCartItems());
-  }, []);
+    // If user exists, fetch user's cart
+    if (user.id) {
+      const fetchItems = async () => {
+        try {
+          await dispatch(fetchCartItems());
+        } catch (err) {
+          console.log(err.message);
+          navigate("/login");
+        }
+      };
+      fetchItems();
+    }
+  }, [user]);
 
   const logout = () => {
     dispatch(removeCurrUser());

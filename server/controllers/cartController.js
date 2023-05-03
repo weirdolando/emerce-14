@@ -33,11 +33,20 @@ async function addCartProduct(req, res) {
   try {
     const [product] = await db
       .promise()
-      .query("SELECT stock, is_active FROM products WHERE id = ?", productId);
+      .query(
+        "SELECT stock, is_active, store_id FROM products WHERE id = ?",
+        productId
+      );
     if (!product.length)
       return res.status(404).json({ error: "Product not found" });
     if (!product[0]["is_active"] || product[0].stock <= 0)
       return res.status(400).json({ error: "Product out of stock / deleted" });
+
+    const [store] = await db
+      .promise()
+      .query("SELECT id FROM stores WHERE user_id = ?", userId);
+    if (store.length && store[0]["id"] === product[0]["store_id"])
+      return res.status(400).json({ error: "Can't buy your own products" });
 
     const [userCart] = await db
       .promise()
@@ -54,18 +63,11 @@ async function addCartProduct(req, res) {
       );
     // If product already exists in cart, add qty instead
     if (productInCart.length) {
-      const [qty] = await db
-        .promise()
-        .query(
-          "SELECT qty FROM cart_items WHERE product_id = ? AND cart_id = ?",
-          [productId, userCartId]
-        );
-      const newQty = qty[0].qty + 1;
       await db
         .promise()
         .query(
-          "UPDATE cart_items SET qty = ? WHERE product_id = ? AND cart_id = ?",
-          [newQty, productId, userCartId]
+          "UPDATE cart_items SET qty = qty + 1 WHERE product_id = ? AND cart_id = ?",
+          [productId, userCartId]
         );
       return res
         .status(200)
@@ -82,6 +84,7 @@ async function addCartProduct(req, res) {
       .status(201)
       .json({ message: "Success added to cart", productId });
   } catch (err) {
+    console.log(err.message);
     return res.status(400).json({ error: err.message });
   }
 }
@@ -131,6 +134,7 @@ async function editCartProduct(req, res) {
       );
     return res.status(200).json({ message: "Cart updated" });
   } catch (err) {
+    console.log(err.message);
     return res.status(400).json({ error: err.message });
   }
 }
@@ -158,6 +162,7 @@ async function deleteCartProduct(req, res) {
       ]);
     return res.status(200).json({ message: "Product deleted" });
   } catch (err) {
+    console.log(err.message);
     return res.status(400).json({ error: err.message });
   }
 }

@@ -14,6 +14,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { BsTrashFill } from "react-icons/bs";
 import { RiExternalLinkLine } from "react-icons/ri";
 import Swal from "sweetalert2";
@@ -22,6 +23,7 @@ import {
   editCartItems,
   deleteCartItems,
 } from "../reducers/cartSlice";
+import { addTransactions } from "../reducers/transactionSlice";
 import { Link } from "react-router-dom";
 
 function CartDetail() {
@@ -31,8 +33,21 @@ function CartDetail() {
     0
   );
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   useEffect(() => {
-    if (!productsInCart.length) dispatch(fetchCartItems());
+    // If no products in cart i.e. when the user refresh the page, fetch cart items
+    if (!productsInCart.length) {
+      const fetchItems = async () => {
+        try {
+          await dispatch(fetchCartItems());
+        } catch (err) {
+          console.log(err.message);
+          navigate("/login");
+        }
+      };
+      fetchItems();
+    }
   }, []);
   return (
     <Grid
@@ -84,8 +99,8 @@ function CartDetail() {
                   icon={<BsTrashFill />}
                   colorScheme="red"
                   onClick={() => {
-                    // TODO: Add confirmation alert before deleting
                     Swal.fire({
+                      icon: "warning",
                       title: "Delete product?",
                       showCancelButton: true,
                       confirmButtonText: "Yes",
@@ -141,7 +156,28 @@ function CartDetail() {
             <Text>Total:</Text>
             <Text color="pink.400">${(subtotal + 4 + 1).toFixed(2)}</Text>
           </Flex>
-          <Button textTransform="uppercase" colorScheme="pink" mt={8} w="100%">
+          <Button
+            textTransform="uppercase"
+            colorScheme="pink"
+            mt={8}
+            w="100%"
+            onClick={async () => {
+              try {
+                await dispatch(
+                  addTransactions({ carts: productsInCart, subtotal })
+                );
+                const result = await Swal.fire({
+                  icon: "success",
+                  title: "Payment Successful",
+                  confirmButtonColor: "#d53f8c",
+                });
+                if (result.isConfirmed) navigate("/history");
+              } catch (err) {
+                console.log(err.message);
+                navigate("/login");
+              }
+            }}
+          >
             Checkout
           </Button>
         </Box>

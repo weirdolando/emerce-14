@@ -20,7 +20,10 @@ async function userExtractor(req, res, next) {
         "SELECT firstname, lastname FROM user_profiles WHERE user_id = ?",
         user[0].id
       );
-    req.user = { ...user[0], ...userProfile[0] };
+    const [store] = await db
+      .promise()
+      .query("SELECT id FROM stores WHERE user_id = ?", user[0].id);
+    req.user = { ...user[0], ...userProfile[0], storeId: store[0]?.id };
     next();
   } catch (err) {
     return res.status(400).json({ error: err.message });

@@ -1,7 +1,6 @@
 import axios from "axios";
 import { createSlice } from "@reduxjs/toolkit";
 import userHelper from "../helper/user";
-import Swal from "sweetalert2";
 
 const BASE_URL = "http://localhost:2000/cart/products";
 
@@ -19,43 +18,27 @@ export const { setCartItems } = cartSlice.actions;
 
 export function fetchCartItems() {
   return async (dispatch) => {
-    try {
-      const token = userHelper.getUserToken();
-      const cartItems = await axios.get(BASE_URL, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      dispatch(setCartItems(cartItems.data.data));
-    } catch (err) {
-      console.log(err.message);
-      //TODO: Redirect to login page?
-    }
+    const token = userHelper.getUserToken();
+    const cartItems = await axios.get(BASE_URL, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    dispatch(setCartItems(cartItems.data.data));
   };
 }
 
 export function postCartItems(productId) {
   return async (dispatch) => {
-    try {
-      const token = userHelper.getUserToken();
-      await axios.post(
-        BASE_URL,
-        { id: productId },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      dispatch(fetchCartItems());
-      Swal.fire({
-        position: "center",
-        title: "✅ Added to cart",
-        width: "300px",
-        showConfirmButton: false,
-        timer: 700,
-      });
-    } catch (err) {
-      console.log(err.message);
-    }
+    const token = userHelper.getUserToken();
+    await axios.post(
+      BASE_URL,
+      { id: productId },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    await dispatch(fetchCartItems());
   };
 }
 
@@ -72,7 +55,7 @@ export function editCartItems(productId, qty) {
           },
         }
       );
-      dispatch(fetchCartItems());
+      await dispatch(fetchCartItems());
     } catch (err) {
       console.log(err.message);
     }
@@ -88,7 +71,7 @@ export function deleteCartItems(productId) {
           Authorization: `Bearer ${token}`,
         },
       });
-      dispatch(fetchCartItems());
+      await dispatch(fetchCartItems());
     } catch (err) {
       console.log(err.message);
     }
