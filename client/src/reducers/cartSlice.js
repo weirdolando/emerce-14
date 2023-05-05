@@ -62,6 +62,7 @@ export function editCartItems(productId, qty) {
   };
 }
 
+// TODO: Add delete all items on cart so after the user checkout, remove all items on cart
 export function deleteCartItems(productId) {
   return async (dispatch) => {
     try {

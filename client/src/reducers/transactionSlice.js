@@ -1,8 +1,6 @@
 import axios from "axios";
 import { createSlice } from "@reduxjs/toolkit";
 import userHelper from "../helper/user";
-import Swal from "sweetalert2";
-import { redirect } from "react-router-dom";
 
 const BASE_URL = "http://localhost:2000/transactions";
 
@@ -18,7 +16,7 @@ const transactionSlice = createSlice({
     setTransactions(state, action) {
       return {
         ...state,
-        transactions: [...action.payload.transactions],
+        transactions: action.payload,
       };
     },
     setTotalPages(state, action) {
@@ -29,16 +27,17 @@ const transactionSlice = createSlice({
 
 export const { setTransactions, setTotalPages } = transactionSlice.actions;
 
-export function fetchTransactions(query = "") {
+export function fetchUserTransactions(query = "") {
   return async (dispatch) => {
     const token = userHelper.getUserToken();
-    const total = await axios.get(`${BASE_URL}/total${query}`);
-    dispatch(setTotalPages(Math.ceil(total.data["total_products"] / 9))),
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      };
-    const res = await axios.get(`${BASE_URL}${query}`);
-    dispatch(setTransactions({ products: res.data.data }), {
+    const total = await axios.get(`${BASE_URL}/user/total/${query}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    dispatch(setTotalPages(Math.ceil(total.data["total_transactions"] / 9)));
+    const res = await axios.get(`${BASE_URL}/user/${query}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    dispatch(setTransactions(res.data.transactions), {
       headers: { Authorization: `Bearer ${token}` },
     });
   };

@@ -8,7 +8,7 @@ import { useSelector } from "react-redux";
 function Home() {
   const [currPage, setCurrPage] = useState(1);
   const [filter, setFilter] = useState({ name: "", sort: "", price: "" });
-  // totalPages, currPage, products
+  // totalPages, products
   const product = useSelector((state) => state.product);
   const dispatch = useDispatch();
 
@@ -21,20 +21,6 @@ function Home() {
       };
     });
   };
-
-  const handlePageChange = (page) => setCurrPage(page);
-
-  const handlePrevPage = () =>
-    setCurrPage((p) => {
-      if (p > 1) return p - 1;
-      return p;
-    });
-
-  const handleNextPage = () =>
-    setCurrPage((p) => {
-      if (p < product.totalPages) return p + 1;
-      return p;
-    });
 
   useEffect(() => {
     const { name, sort, price } = filter;
@@ -62,10 +48,8 @@ function Home() {
       <MainNavbar filterName={filter.name} onChange={handleChange} />
       <Hero
         onChange={handleChange}
-        onPageChange={handlePageChange}
-        onPrevPage={handlePrevPage}
-        onNextPage={handleNextPage}
         currPage={currPage}
+        setCurrPage={setCurrPage}
         product={product}
       />
     </>

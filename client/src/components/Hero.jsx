@@ -1,24 +1,8 @@
-import {
-  Text,
-  Grid,
-  GridItem,
-  Box,
-  Stack,
-  Button,
-  IconButton,
-  Select,
-} from "@chakra-ui/react";
+import { Text, Grid, GridItem, Box, Stack, Select } from "@chakra-ui/react";
 import ProductCard from "./ProductCard";
-import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
+import Pagination from "./Pagination";
 
-function Hero({
-  onChange,
-  onPageChange,
-  onPrevPage,
-  onNextPage,
-  currPage,
-  product,
-}) {
+function Hero({ onChange, currPage, setCurrPage, product }) {
   return (
     <Box w="50%" maxW="1200px" my="0" mx="auto">
       <Text
@@ -67,39 +51,12 @@ function Hero({
           );
         })}
       </Grid>
-      {/* TODO: what if there are 100 pages? Make the pagination only shows 10 max at once  */}
-      <Stack direction="row" spacing={2} my={8} align="center" justify="center">
-        <IconButton
-          aria-label="previous page button"
-          w={8}
-          h={8}
-          icon={<ChevronLeftIcon />}
-          isDisabled={currPage === 1}
-          onClick={onPrevPage}
-        />
-        {Array(product.totalPages)
-          .fill(0)
-          .map((_, i) => (
-            <Button
-              w={8}
-              h={8}
-              colorScheme="pink"
-              variant={currPage === i + 1 ? "solid" : "ghost"}
-              key={i}
-              onClick={() => onPageChange(i + 1)}
-            >
-              {i + 1}
-            </Button>
-          ))}
-        <IconButton
-          aria-label="next page button"
-          w={8}
-          h={8}
-          isDisabled={currPage === product.totalPages}
-          icon={<ChevronRightIcon />}
-          onClick={onNextPage}
-        />
-      </Stack>
+      {/* Pagination */}
+      <Pagination
+        data={product}
+        currPage={currPage}
+        setCurrPage={setCurrPage}
+      />
     </Box>
   );
 }
