@@ -4,9 +4,6 @@ import {
   Grid,
   GridItem,
   Box,
-  Stack,
-  VStack,
-  HStack,
   Image,
   Button,
   Divider,
@@ -36,7 +33,7 @@ function CartDetail() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // If no products in cart i.e. when the user refresh the page, fetch cart items
+    // If no products in cart (i.e. when the user refreshes the page), fetch cart items
     if (!productsInCart.length) {
       const fetchItems = async () => {
         try {
