@@ -3,6 +3,7 @@ import {
   Flex,
   Text,
   IconButton,
+  Image,
   Button,
   HStack,
   VStack,
@@ -39,12 +40,30 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { removeCurrUser } from "../reducers/userSlice";
 import { fetchProducts } from "../reducers/productSlice";
+import { useEffect } from "react";
+import { fetchCartItems } from "../reducers/cartSlice";
 
 export default function MainNavbar({ filterName, onChange }) {
   const { isOpen, onToggle } = useDisclosure();
   const user = useSelector((state) => state.user.currUser);
+  const cart = useSelector((state) => state.cart);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // If user exists, fetch user's cart
+    if (user.id) {
+      const fetchItems = async () => {
+        try {
+          await dispatch(fetchCartItems());
+        } catch (err) {
+          console.log(err.message);
+          navigate("/login");
+        }
+      };
+      fetchItems();
+    }
+  }, [user]);
 
   const logout = () => {
     dispatch(removeCurrUser());
@@ -83,7 +102,7 @@ export default function MainNavbar({ filterName, onChange }) {
       label: "Cart",
       type: "cart",
       mobileItem: "none",
-      children: [],
+      children: cart,
     },
     {
       label: "Account",
@@ -155,6 +174,7 @@ export default function MainNavbar({ filterName, onChange }) {
               onChange={onChange}
               dispatch={dispatch}
               navItems={NAV_ITEMS}
+              cart={cart}
             />
           </Flex>
         </Flex>
@@ -211,6 +231,7 @@ const DesktopNav = ({
   onChange,
   dispatch,
   navItems: NAV_ITEMS,
+  cart,
 }) => {
   const linkColor = "gray.600";
   const linkHoverColor = "gray.800";
@@ -231,6 +252,7 @@ const DesktopNav = ({
               md: "inline-flex",
             }
           }
+          position="relative"
         >
           {navItem.type === "category" ? (
             <Popover trigger={"hover"} placement={"bottom-start"}>
@@ -276,18 +298,55 @@ const DesktopNav = ({
                 transition="all 0.3s"
                 _focus={{ boxShadow: "none" }}
               />
+              <Flex
+                w={5}
+                h={5}
+                borderRadius="full"
+                bg="red.400"
+                align="center"
+                justify="center"
+                position="absolute"
+                top="-2"
+                right="-2"
+              >
+                <Text color="white" fontSize="xs">
+                  {cart.length > 99 ? 99 : cart.length}
+                </Text>
+              </Flex>
+
               {navItem.children && (
                 <MenuList bg="white" borderColor="gray.200">
                   {navItem.children.map((child) => (
                     <MenuItem
-                      key={child.label}
-                      href={child.href ? child.href : "#"}
+                      key={child.id}
+                      as={RLink}
+                      to={`/product/${child.id}`}
                     >
-                      {child.label}
+                      <HStack spacing={4}>
+                        <Image
+                          src={child.image}
+                          w="100px"
+                          h="50px"
+                          objectFit="contain"
+                        />
+                        <VStack align="start" spacing="0">
+                          <Text maxW="200px" isTruncated>
+                            {child["product_name"]}
+                          </Text>
+                          <Text fontSize="xs">
+                            {child.qty} item{child.qty > 1 && "s"}
+                          </Text>
+                        </VStack>
+                        <Text color="pink.400" fontWeight={500}>
+                          ${(child.price * child.qty).toFixed(2)}
+                        </Text>
+                      </HStack>
                     </MenuItem>
                   ))}
                   <MenuDivider />
-                  <MenuItem>See cart</MenuItem>
+                  <MenuItem as={RLink} to="/cart">
+                    See cart
+                  </MenuItem>
                 </MenuList>
               )}
             </Menu>

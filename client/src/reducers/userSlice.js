@@ -8,6 +8,7 @@ const initUser = {
     email: "",
     firstname: "",
     lastname: "",
+    storeId: null,
   },
 };
 
@@ -34,7 +35,7 @@ export function getCurrUser() {
   return async (dispatch) => {
     try {
       const res = await userHelper.getUserAsync();
-      // `res.data` is the user data i.e. id, username, email, firstname, lastname
+      // `res.data` is the user data i.e. id, username, email, firstname, lastname, storeId
       dispatch(setCurrUser(res.data));
     } catch (err) {
       dispatch(removeCurrUser());

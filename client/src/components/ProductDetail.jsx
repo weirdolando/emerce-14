@@ -1,6 +1,7 @@
 import {
   Box,
   Container,
+  HStack,
   Stack,
   Text,
   Image,
@@ -17,10 +18,17 @@ import { MdLocalShipping } from "react-icons/md";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { postCartItems } from "../reducers/cartSlice";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 export default function ProductDetail() {
   const [product, setProduct] = useState({});
+  const user = useSelector((state) => state.user.currUser);
   const id = useParams().id;
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios
@@ -98,6 +106,10 @@ export default function ProductDetail() {
                   ))
                 )}
               </UnorderedList>
+              <HStack spacing={8} mt={8}>
+                <Text fontWeight={500}>Stock: {product.stock}</Text>
+                <Text fontWeight={500}>Sold: {product.sold}</Text>
+              </HStack>
             </Box>
             {/* TODO: Add store maybe? if the backend is done or I'm not lazy lol */}
             <Box>
@@ -124,7 +136,6 @@ export default function ProductDetail() {
               </SimpleGrid>
             </Box>
           </Stack>
-
           <Button
             rounded={"none"}
             w={"full"}
@@ -137,6 +148,24 @@ export default function ProductDetail() {
             _hover={{
               transform: "translateY(2px)",
               boxShadow: "lg",
+            }}
+            isDisabled={
+              product.stock <= 0 || user.storeId === product["store_id"]
+            }
+            onClick={async () => {
+              try {
+                await dispatch(postCartItems(product.id));
+                Swal.fire({
+                  position: "center",
+                  title: "✅ Added to cart",
+                  width: "300px",
+                  showConfirmButton: false,
+                  timer: 700,
+                });
+              } catch (err) {
+                console.log(err.message);
+                navigate("/login");
+              }
             }}
           >
             Add to cart

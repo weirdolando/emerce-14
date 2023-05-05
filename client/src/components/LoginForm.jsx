@@ -12,10 +12,13 @@ import {
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import userHelper from "../helper/user";
+import { getCurrUser } from "../reducers/userSlice";
 
 const RegisterForm = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   return (
     <Box bg="white" p={6} rounded="md" w="80%" maxW={500}>
@@ -27,22 +30,21 @@ const RegisterForm = () => {
           email: "",
           password: "",
         }}
-        onSubmit={(values) => {
-          userHelper
-            .loginUserAsync(values)
-            .then(() => {
-              navigate("/");
-            })
-            .catch((err) => {
-              console.log(err.message);
-              Swal.fire({
-                position: "center",
-                icon: "error",
-                title: "Email / Password Incorrect",
-                showConfirmButton: false,
-                timer: 1500,
-              });
+        onSubmit={async (values) => {
+          try {
+            await userHelper.loginUserAsync(values);
+            await dispatch(getCurrUser());
+            navigate("/");
+          } catch (err) {
+            console.log(err.message);
+            Swal.fire({
+              position: "center",
+              icon: "error",
+              title: "Email / Password Incorrect",
+              showConfirmButton: false,
+              timer: 1500,
             });
+          }
         }}
       >
         {({ errors, touched }) => (

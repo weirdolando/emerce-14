@@ -10,6 +10,10 @@ import {
 import { BsStar, BsStarFill, BsStarHalf } from "react-icons/bs";
 import { FiShoppingCart } from "react-icons/fi";
 import { Link } from "react-router-dom";
+import { postCartItems } from "../reducers/cartSlice";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 function Rating({ rating, numReviews }) {
   rating = (Math.random() * (5 - 4) + 4).toFixed(1);
@@ -42,7 +46,27 @@ function Rating({ rating, numReviews }) {
   );
 }
 
-function ProductCart({ product = {}, idx = 0, page = "product" }) {
+function ProductCard({ product = {}, idx = 0, page = "product" }) {
+  const user = useSelector((state) => state.user.currUser);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  async function handleAddCart(e) {
+    e.preventDefault();
+    try {
+      await dispatch(postCartItems(product.id));
+      Swal.fire({
+        position: "center",
+        title: "✅ Added to cart",
+        width: "300px",
+        showConfirmButton: false,
+        timer: 700,
+      });
+    } catch (err) {
+      console.log(err.message);
+      navigate("/login");
+    }
+  }
+
   return (
     <Box
       bg="white"
@@ -110,7 +134,9 @@ function ProductCart({ product = {}, idx = 0, page = "product" }) {
               size="lg"
               aria-label="Add to cart"
               variant="ghost"
+              onClick={handleAddCart}
               icon={<FiShoppingCart />}
+              isDisabled={product["store_id"] === user.storeId}
             />
           </Tooltip>
         </Flex>
@@ -129,4 +155,4 @@ function ProductCart({ product = {}, idx = 0, page = "product" }) {
   );
 }
 
-export default ProductCart;
+export default ProductCard;
