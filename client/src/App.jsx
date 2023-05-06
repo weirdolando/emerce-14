@@ -8,6 +8,7 @@ import ProductDetailPage from "./pages/ProductDetailPage";
 import CartDetailPage from "./pages/CartDetailPage";
 import TransactionPage from "./pages/TransactionPage";
 import { getCurrUser } from "./reducers/userSlice";
+import StorePage from "./pages/StorePage";
 import { AddProductForm } from "./components/AddProductForm";
 import { AddCategoryForm } from "./components/AddCategoryForm";
 
@@ -27,6 +28,7 @@ function App() {
         <Route path="/product/:id" element={<ProductDetailPage />} />
         <Route path="/cart" element={<CartDetailPage />} />
         <Route path="/history" element={<TransactionPage />} />
+        <Route path="/store" element={<StorePage />} />
         <Route path="/add-product" element={<AddProductForm />} />
         <Route path="/add-category" element={<AddCategoryForm />} />
       </Routes>
