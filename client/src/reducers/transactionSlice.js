@@ -57,7 +57,6 @@ export function fetchStoreTransactions(storeId, query = "") {
     const res = await axios.get(`${BASE_URL}/store/${storeId}${query}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    console.log(res.data);
     dispatch(setTransactions(res.data.transactions), {
       headers: { Authorization: `Bearer ${token}` },
     });

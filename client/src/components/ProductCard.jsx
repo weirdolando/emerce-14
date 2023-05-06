@@ -77,7 +77,7 @@ function ProductCard({ product = {}, idx = 0, page = "product" }) {
       position="relative"
       display="block"
       as={Link}
-      to={`product/${product.id}`}
+      to={`/product/${product.id}`}
     >
       {page === "report" && idx < 5 && (
         <Circle
@@ -123,22 +123,24 @@ function ProductCard({ product = {}, idx = 0, page = "product" }) {
           >
             {product["product_name"]}
           </Box>
-          <Tooltip
-            label="Add to cart"
-            bg="white"
-            placement={"top"}
-            color={"gray.800"}
-            fontSize={"1.2em"}
-          >
-            <IconButton
-              size="lg"
-              aria-label="Add to cart"
-              variant="ghost"
-              onClick={handleAddCart}
-              icon={<FiShoppingCart />}
-              isDisabled={product["store_id"] === user.storeId}
-            />
-          </Tooltip>
+          {page !== "report" && (
+            <Tooltip
+              label="Add to cart"
+              bg="white"
+              placement={"top"}
+              color={"gray.800"}
+              fontSize={"1.2em"}
+            >
+              <IconButton
+                size="lg"
+                aria-label="Add to cart"
+                variant="ghost"
+                onClick={handleAddCart}
+                icon={<FiShoppingCart />}
+                isDisabled={product["store_id"] === user.storeId}
+              />
+            </Tooltip>
+          )}
         </Flex>
 
         <Flex justifyContent="space-between" alignContent="center">

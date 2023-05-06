@@ -15,14 +15,16 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { fetchStoreTransactions } from "../reducers/transactionSlice";
-import Hero from "./Hero";
+import { fetchStoreProducts, fetchCategories } from "../reducers/productSlice";
+import ProductCard from "./ProductCard";
+import Pagination from "./Pagination";
 
 function Reporting() {
   const [currPage, setCurrPage] = useState(1);
-  const [filter, setFilter] = useState({ start: "", end: "" });
+  const [filter, setFilter] = useState({ start: "", end: "", category: 0 });
   const user = useSelector((state) => state.user.currUser);
   const transactionData = useSelector((state) => state.transaction);
-  const product = useSelector((state) => state.product);
+  const productData = useSelector((state) => state.product);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -33,6 +35,10 @@ function Reporting() {
       [name]: value,
     }));
   }
+
+  useEffect(() => {
+    dispatch(fetchCategories());
+  }, []);
 
   useEffect(() => {
     const fetchTransactions = async () => {
@@ -49,17 +55,18 @@ function Reporting() {
       }
     };
     fetchTransactions();
-  }, [filter, user]);
+  }, [filter.start, filter.end, user]);
 
-  // useEffect(() => {
-  //   // TODO: Add fetchProducts using storeId on productController
-  //   dispatch(fetchProducts(query));
-  // }, [currPage]);
+  useEffect(() => {
+    let query = "";
+    if (filter.category) query += `?categoryId=${filter.category}`;
+    dispatch(fetchStoreProducts(query));
+  }, [currPage, filter.category]);
 
   // !FIXME: The issue is the same as in Home.jsx
-  // useEffect(() => {
-  //   setCurrPage(1);
-  // }, [transactionData.totalPages]);
+  useEffect(() => {
+    setCurrPage(1);
+  }, [productData.totalPages]);
 
   return (
     <Box py={6} px={5} min={"100vh"}>
@@ -85,22 +92,58 @@ function Reporting() {
         </FormControl>
       </Stack>
       {(!filter.start || !filter.end) && (
-        <Text fontSize="xl" my={4}>
+        <Text fontSize="xl" mt={4}>
           Last 7 Days
         </Text>
       )}
-      <Text fontSize="xl">
+      <Text fontSize="lg">
         Gross Income:{" "}
         <Text as="span" fontWeight={500} color="pink.400">
           ${transactionData.transactions.reduce((acc, e) => acc + e.total, 0)}
         </Text>
       </Text>
-      <Text fontSize="xl">
+      <Text fontSize="lg">
         Total Transactions:{" "}
         <Text as="span" fontWeight={500} color="pink.400">
           {transactionData.transactions.length}
         </Text>
       </Text>
+
+      <Heading mt={8} mb={4}>
+        Products
+      </Heading>
+      <Grid
+        mt={4}
+        templateColumns="repeat(auto-fit, 300px)"
+        justifyContent={"center"}
+        alignItems={"center"}
+        gap={4}
+      >
+        <GridItem colStart={1} colEnd={-1}>
+          <Select
+            placeholder="Category"
+            name="category"
+            margin="0 auto"
+            onChange={handleChange}
+          >
+            {productData.categories.map((e) => (
+              <option key={e.id} value={e.id}>
+                {e.category}
+              </option>
+            ))}
+          </Select>
+        </GridItem>
+        {productData.products.map((product, idx) => (
+          <GridItem key={product.id}>
+            <ProductCard product={product} idx={idx} page="report" />
+          </GridItem>
+        ))}
+      </Grid>
+      <Pagination
+        data={productData}
+        currPage={currPage}
+        setCurrPage={setCurrPage}
+      />
     </Box>
   );
 }
