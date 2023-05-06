@@ -9,6 +9,8 @@ import CartDetailPage from "./pages/CartDetailPage";
 import TransactionPage from "./pages/TransactionPage";
 import { getCurrUser } from "./reducers/userSlice";
 import StorePage from "./pages/StorePage";
+import { AddProductForm } from "./components/AddProductForm";
+import { AddCategoryForm } from "./components/AddCategoryForm";
 
 function App() {
   const dispatch = useDispatch();
@@ -27,6 +29,8 @@ function App() {
         <Route path="/cart" element={<CartDetailPage />} />
         <Route path="/history" element={<TransactionPage />} />
         <Route path="/store" element={<StorePage />} />
+        <Route path="/add-product" element={<AddProductForm />} />
+        <Route path="/add-category" element={<AddCategoryForm />} />
       </Routes>
     </div>
   );

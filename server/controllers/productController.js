@@ -69,6 +69,19 @@ module.exports = {
     );
   },
 
+  getCategory: (req, res) => {
+    db.query(
+      `select * from categories`,
+      (err, result) => {
+        if (err) return res.status(400).send(err);
+        res.send({
+          status: 200,
+          data: result,
+        });
+      }
+    );
+  },
+
   getTotalProduct: (req, res) => {
     var where = "";
     if (req.query.category != null || req.query.name != null) {
@@ -140,6 +153,22 @@ module.exports = {
         });
       }
     );
+  },
+
+  addCategory: (req, res) => {
+    const {category_name} = req.body
+    db.query(
+      `insert into categories(category) values
+            (${db.escape(category_name)});`,
+      (err) => {
+        if (err) res.status(400).send(err);
+        res.send({
+          status: 200,
+          message: "Category added",
+        });
+      }
+    );
+
   },
 
   editProduct: (req, res) => {
