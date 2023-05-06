@@ -36,7 +36,7 @@ module.exports = {
     }
 
     var where = "";
-    if (req.query.category != null || req.query.name != null) {
+    if (req.query.category_id != null || req.query.name != null) {
       where = "where ";
     }
 
@@ -46,17 +46,17 @@ module.exports = {
     }
 
     var and = "";
-    if (req.query.category != null && req.query.name != null) {
+    if (req.query.category_id != null && req.query.name != null) {
       and = "and ";
     }
 
-    var category = "";
-    if (req.query.category != null) {
-      category = `category = '${req.query.category}' `;
+    var category_id = "";
+    if (req.query.category_id != null) {
+      category_id = `category_id = '${req.query.category_id}' `;
     }
 
     db.query(
-      `select * from products ${where}${name}${and}${category}${orderBy}${sort}${price}limit 9 offset ${
+      `select * from products ${where}${name}${and}${category_id}${orderBy}${sort}${price}limit 9 offset ${
         (page - 1) * 9
       }`,
       (err, result) => {
@@ -81,7 +81,7 @@ module.exports = {
 
   getTotalProduct: (req, res) => {
     var where = "";
-    if (req.query.category != null || req.query.name != null) {
+    if (req.query.category_id != null || req.query.name != null) {
       where = "where ";
     }
 
@@ -91,17 +91,17 @@ module.exports = {
     }
 
     var and = "";
-    if (req.query.category != null && req.query.name != null) {
+    if (req.query.category_id != null && req.query.name != null) {
       and = "and ";
     }
 
-    var category = "";
-    if (req.query.category != null) {
-      category = `category = '${req.query.category}' `;
+    var category_id = "";
+    if (req.query.category_id != null) {
+      category_id = `category_id = '${req.query.category_id}' `;
     }
 
     db.query(
-      `select count(*) as total_products from products ${where}${name}${and}${category}`,
+      `select count(*) as total_products from products ${where}${name}${and}${category_id}`,
       (err, result) => {
         if (err) res.status(400).send(err);
         res.send({
@@ -195,6 +195,19 @@ module.exports = {
     );
   },
 
+  getCategoryDetail: (req, res) => {
+    db.query(
+      `select * from categories where id = ${req.params.id}`,
+      (err, result) => {
+        if (err) res.status(400).send(err);
+        res.send({
+          status: 200,
+          data: result[0],
+        });
+      }
+    );
+  },
+
   addProduct: (req, res) => {
     const {
       store_id,
@@ -246,6 +259,20 @@ module.exports = {
         res.send({
           status: 200,
           message: "Product updated",
+        });
+      }
+    );
+  },
+
+  editCategory: (req, res) => {
+    db.query(
+      `update categories set ? where id = ?`,
+      [req.body, req.params.id],
+      (err) => {
+        if (err) res.status(400).send(err);
+        res.send({
+          status: 200,
+          message: "Category updated",
         });
       }
     );
