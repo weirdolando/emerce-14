@@ -13,6 +13,7 @@ import { AddCategoryForm } from "./components/AddCategoryForm";
 import { EditProductForm } from "./components/EditProductForm";
 import { EditCategoryForm } from "./components/EditCategoryForm";
 import { DashboardProduct } from "./components/DashboardProduct";
+import StorePage from "./pages/StorePage";
 
 function App() {
   const dispatch = useDispatch();
@@ -35,6 +36,7 @@ function App() {
         <Route path="/edit-product" element={<EditProductForm/>} />
         <Route path="/edit-category" element={<EditCategoryForm/>} />
         <Route path="/dashboard" element={<DashboardProduct/>} />
+        <Route path="/store" element={<StorePage />} />
       </Routes>
     </div>
   );

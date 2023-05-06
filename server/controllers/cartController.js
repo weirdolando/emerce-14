@@ -48,13 +48,23 @@ async function addCartProduct(req, res) {
     if (store.length && store[0]["id"] === product[0]["store_id"])
       return res.status(400).json({ error: "Can't buy your own products" });
 
-    const [userCart] = await db
+    let [userCart] = await db
       .promise()
       .query(
         "SELECT c.id FROM carts c JOIN users u WHERE c.user_id = ? LIMIT 1",
         userId
       );
-    const userCartId = userCart[0].id;
+    if (!userCart.length)
+      await db
+        .promise()
+        .query("INSERT INTO carts (user_id) VALUES (?)", userId);
+    userCart = await db
+      .promise()
+      .query(
+        "SELECT c.id FROM carts c JOIN users u WHERE c.user_id = ? LIMIT 1",
+        userId
+      );
+    const userCartId = userCart[0][0].id;
     const [productInCart] = await db
       .promise()
       .query(

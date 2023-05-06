@@ -62,8 +62,8 @@ export function DashboardProduct() {
     return (
         <Stack spacing={8} mx={"auto"} w={"80%"} py={12} px={6}>
             <Stack align={"center"}>
-                <Heading fontSize={"4xl"} textAlign={"center"} color="teal">
-                    Available Products
+                <Heading fontSize={"4xl"} textAlign={"center"} color="black">
+                    Dashboard Product
                 </Heading>
                 <Input
                     placeholder="Search product"
@@ -123,7 +123,11 @@ export function DashboardProduct() {
                                     <ButtonGroup spacing="2">
                                         <Button
                                             variant="solid"
-                                            colorScheme="teal"
+                                            color="white"
+                                            bg={"pink.400"}
+                                            _hover={{
+                                                bg: "pink.300",
+                                            }}
                                             onClick={() =>
                                                 navigate(
                                                     "/product/" + product.id
@@ -134,7 +138,11 @@ export function DashboardProduct() {
                                         </Button>
                                         <Button
                                             variant="solid"
-                                            colorScheme="teal"
+                                            color="white"
+                                            bg={"pink.400"}
+                                            _hover={{
+                                                bg: "pink.300",
+                                            }}
                                         >
                                             Edit
                                         </Button>
