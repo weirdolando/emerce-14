@@ -70,16 +70,13 @@ module.exports = {
   },
 
   getCategory: (req, res) => {
-    db.query(
-      `select * from categories`,
-      (err, result) => {
-        if (err) return res.status(400).send(err);
-        res.send({
-          status: 200,
-          data: result,
-        });
-      }
-    );
+    db.query(`select * from categories`, (err, result) => {
+      if (err) return res.status(400).send(err);
+      res.send({
+        status: 200,
+        data: result,
+      });
+    });
   },
 
   getTotalProduct: (req, res) => {

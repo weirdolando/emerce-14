@@ -15,6 +15,7 @@ import { EditCategoryForm } from "./components/EditCategoryForm";
 import { DashboardProduct } from "./components/DashboardProduct";
 import StorePage from "./pages/StorePage";
 
+
 function App() {
   const dispatch = useDispatch();
 
