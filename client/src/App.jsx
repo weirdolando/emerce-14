@@ -10,6 +10,9 @@ import TransactionPage from "./pages/TransactionPage";
 import { getCurrUser } from "./reducers/userSlice";
 import { AddProductForm } from "./components/AddProductForm";
 import { AddCategoryForm } from "./components/AddCategoryForm";
+import { EditProductForm } from "./components/EditProductForm";
+import { EditCategoryForm } from "./components/EditCategoryForm";
+import { DashboardProduct } from "./components/DashboardProduct";
 
 function App() {
   const dispatch = useDispatch();
@@ -29,6 +32,9 @@ function App() {
         <Route path="/history" element={<TransactionPage />} />
         <Route path="/add-product" element={<AddProductForm />} />
         <Route path="/add-category" element={<AddCategoryForm />} />
+        <Route path="/edit-product" element={<EditProductForm/>} />
+        <Route path="/edit-category" element={<EditCategoryForm/>} />
+        <Route path="/dashboard" element={<DashboardProduct/>} />
       </Routes>
     </div>
   );

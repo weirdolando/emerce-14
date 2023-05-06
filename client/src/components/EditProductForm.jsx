@@ -17,20 +17,34 @@ import { useNavigate} from "react-router-dom";
 import { useState } from "react"
 import axios from "axios";
 
-export const AddProductForm = () => {
+export const EditProductForm = () => {
     const navigate = useNavigate();
+    let product_id = 1
+
+
+    const [productValue, setProductValue] = useState("");
+    async function fetchProductValue() {
+        let url_detail = "http://localhost:2000/product/"+product_id
+
+        const productData = await axios.get(url_detail);
+        setProductValue(productData.data.data)
+    }
+
+    fetchProductValue();
+    // console.log(productValue)
+
     const [categories, setCategories] = useState([]);
-    async function fetchCategories() {
+    async function fetchProducts() {
         let url = "http://localhost:2000/product/category"
 
         const categoryList = await axios.get(url);
         setCategories(categoryList.data.data)
     }
 
-    fetchCategories();
+    fetchProducts();
 
-    const optionList = categories.map((item) => <option value={item.id}>{item.category}</option>);
-    // console.log(categoryList)
+    const optionList = categories.map((item) => item.id == productValue.category_id ? (<option value={item.id} selected>{item.category}</option>) : (<option value={item.id}>{item.category}</option>));
+    // console.log(optionList)
 
     const addProduct = async () => {
         try {
@@ -45,8 +59,8 @@ export const AddProductForm = () => {
                 is_active: 1,
             };
 
-            const url = "http://localhost:2000/product";
-            const result = await axios.post(url, data);
+            const url = "http://localhost:2000/product/"+product_id;
+            const result = await axios.patch(url, data);
 
             document.getElementById("name").value = "";
             document.getElementById("description").value = "";
@@ -86,23 +100,23 @@ export const AddProductForm = () => {
                         <VStack>
                             <FormControl id="name" isRequired>
                                 <FormLabel>Product Name</FormLabel>
-                                <Input type="text" />
+                                <Input type="text" defaultValue={productValue.product_name} />
                             </FormControl>
                             <FormControl id="description" isRequired>
                                 <FormLabel>Description</FormLabel>
-                                <Input type="text" />
+                                <Input type="text" defaultValue={productValue.description}/>
                             </FormControl>
                             <FormControl id="price" isRequired>
                                 <FormLabel>Price</FormLabel>
-                                <Input type="text" />
+                                <Input type="text" defaultValue={productValue.price}/>
                             </FormControl>
                             <FormControl id="stock" isRequired>
                                 <FormLabel>Stock</FormLabel>
-                                <Input type="text" />
+                                <Input type="text" defaultValue={productValue.stock}/>
                             </FormControl>
                             <FormControl id="image" isRequired>
                                 <FormLabel>Image</FormLabel>
-                                <Input type="text" />
+                                <Input type="text" defaultValue={productValue.image}/>
                             </FormControl>
                             <Select id="category_id" placeholder="Select Category" isRequired>
                                 {optionList}
