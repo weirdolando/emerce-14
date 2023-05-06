@@ -8,6 +8,7 @@ import ProductDetailPage from "./pages/ProductDetailPage";
 import CartDetailPage from "./pages/CartDetailPage";
 import TransactionPage from "./pages/TransactionPage";
 import { getCurrUser } from "./reducers/userSlice";
+import StorePage from "./pages/StorePage";
 
 function App() {
   const dispatch = useDispatch();
@@ -25,6 +26,7 @@ function App() {
         <Route path="/product/:id" element={<ProductDetailPage />} />
         <Route path="/cart" element={<CartDetailPage />} />
         <Route path="/history" element={<TransactionPage />} />
+        <Route path="/store" element={<StorePage />} />
       </Routes>
     </div>
   );

@@ -43,6 +43,27 @@ export function fetchUserTransactions(query = "") {
   };
 }
 
+export function fetchStoreTransactions(storeId, query = "") {
+  return async (dispatch) => {
+    const token = userHelper.getUserToken();
+    // * Uncomment this if you want to use pagination, also change the backend as well
+    // const total = await axios.get(
+    //   `${BASE_URL}/store/total/${storeId}${query}`,
+    //   {
+    //     headers: { Authorization: `Bearer ${token}` },
+    //   }
+    // );
+    // dispatch(setTotalPages(Math.ceil(total.data["total_transactions"] / 9)));
+    const res = await axios.get(`${BASE_URL}/store/${storeId}${query}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    console.log(res.data);
+    dispatch(setTransactions(res.data.transactions), {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  };
+}
+
 export function addTransactions(data) {
   return async () => {
     const token = userHelper.getUserToken();
