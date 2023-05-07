@@ -21,6 +21,7 @@ export const AddProductForm = () => {
     const navigate = useNavigate();
     const [categories, setCategories] = useState([]);
     async function fetchCategories() {
+
         let url = "http://localhost:2000/product/category"
 
         const categoryList = await axios.get(url);

@@ -24,6 +24,7 @@ export function DashboardProduct() {
     const [products, setProducts] = useState([]);
     const [totalPage, setTotalPage] = useState(0);
     const [page, setPage] = useState(1);
+
     const [option, setOption] = useState(0);
     const [category_id, setCategoryId] = useState(0);
     const [name, setName] = useState("");
@@ -184,6 +185,7 @@ export function DashboardProduct() {
                                         </div>
                                         <Text><b>Sold: </b>{product.sold}</Text>
                                         {product.is_active==1 ? <Text color={"green"}>Active</Text> : <Text color={"red"}>Inactive</Text>}
+
                                     </Stack>
                                 </CardBody>
                                 <CardFooter>
@@ -194,6 +196,7 @@ export function DashboardProduct() {
                                             _hover={{
                                                 bg: "pink.300",
                                             }}
+
                                             color="white"
                                             onClick={() =>
                                                 navigate(
@@ -208,8 +211,7 @@ export function DashboardProduct() {
                             </Card>
                         );
                     })}
-                </SimpleGrid>
-                
+                </SimpleGrid>                
             </Center>
             <Center>
                 <Link onClick={prevPage}>&#60;&nbsp;&nbsp;&nbsp;&nbsp;</Link>

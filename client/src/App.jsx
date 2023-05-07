@@ -14,6 +14,7 @@ import { EditProductForm } from "./components/EditProductForm";
 import { EditCategoryForm } from "./components/EditCategoryForm";
 import { DashboardProduct } from "./components/DashboardProduct";
 import { CategoryList } from "./components/CategoryList";
+import StorePage from "./pages/StorePage";
 
 function App() {
   const dispatch = useDispatch();
