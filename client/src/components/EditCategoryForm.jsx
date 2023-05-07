@@ -13,13 +13,14 @@ import {
     Link,
     Select,
 } from "@chakra-ui/react";
-import { useNavigate } from "react-router-dom";
+
+import { useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 
 export const EditCategoryForm = () => {
     const navigate = useNavigate();
-    let category_id = 1
+    let category_id = useParams().id
 
     const [categoryValue, setCategoryValue] = useState("");
     async function fetchCategoryValue() {
@@ -44,8 +45,8 @@ export const EditCategoryForm = () => {
             document.getElementById("name").value = "";
 
             setTimeout(() => {
-                navigate("/");
-            }, 1500);
+                navigate(-1);
+            }, 500);
         } catch (err) {
             console.log(err);
         }
@@ -96,7 +97,7 @@ export const EditCategoryForm = () => {
                             <Text align={"center"}>
                                 <Link
                                     color={"blue.400"}
-                                    onClick={() => navigate("/")}
+                                    onClick={() => navigate(-1)}
                                 >
                                     Back
                                 </Link>

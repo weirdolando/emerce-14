@@ -12,7 +12,6 @@ router.get(
   userExtractor,
   productController.getTotalStoreProducts
 );
-
 router.get("/category/:id", productController.getCategoryDetail)
 router.get("/:id", productController.getProductDetail)
 

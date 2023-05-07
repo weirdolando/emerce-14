@@ -13,8 +13,8 @@ import { AddCategoryForm } from "./components/AddCategoryForm";
 import { EditProductForm } from "./components/EditProductForm";
 import { EditCategoryForm } from "./components/EditCategoryForm";
 import { DashboardProduct } from "./components/DashboardProduct";
+import { CategoryList } from "./components/CategoryList";
 import StorePage from "./pages/StorePage";
-
 
 function App() {
   const dispatch = useDispatch();
@@ -34,10 +34,11 @@ function App() {
         <Route path="/history" element={<TransactionPage />} />
         <Route path="/add-product" element={<AddProductForm />} />
         <Route path="/add-category" element={<AddCategoryForm />} />
-        <Route path="/edit-product" element={<EditProductForm/>} />
-        <Route path="/edit-category" element={<EditCategoryForm/>} />
+        <Route path="/edit-product/:id" element={<EditProductForm/>} />
+        <Route path="/edit-category/:id" element={<EditCategoryForm/>} />
         <Route path="/dashboard" element={<DashboardProduct/>} />
-        <Route path="/store" element={<StorePage />} />
+        <Route path="/store" element={<StorePage/>} />
+        <Route path="/category" element={<CategoryList/>} />
       </Routes>
     </div>
   );
