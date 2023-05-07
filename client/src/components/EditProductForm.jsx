@@ -15,11 +15,12 @@ import {
 } from "@chakra-ui/react";
 import { useNavigate} from "react-router-dom";
 import { useState } from "react"
+import { useParams } from "react-router-dom";
 import axios from "axios";
 
 export const EditProductForm = () => {
     const navigate = useNavigate();
-    let product_id = 1
+    let product_id = useParams().id
 
 
     const [productValue, setProductValue] = useState("");
@@ -34,19 +35,18 @@ export const EditProductForm = () => {
     // console.log(productValue)
 
     const [categories, setCategories] = useState([]);
-    async function fetchProducts() {
+    async function fetchCategories() {
         let url = "http://localhost:2000/product/category"
 
         const categoryList = await axios.get(url);
         setCategories(categoryList.data.data)
     }
 
-    fetchProducts();
+    fetchCategories();
 
     const optionList = categories.map((item) => item.id == productValue.category_id ? (<option value={item.id} selected>{item.category}</option>) : (<option value={item.id}>{item.category}</option>));
-    // console.log(optionList)
 
-    const addProduct = async () => {
+    const editProduct = async () => {
         try {
             const data = {
                 product_name: document.getElementById("name").value,
@@ -54,9 +54,9 @@ export const EditProductForm = () => {
                 price: document.getElementById("price").value,
                 stock: document.getElementById("stock").value,
                 image: document.getElementById("image").value,
+                is_active: document.getElementById("is_active").value,
                 category_id: document.getElementById("category_id").value,
                 store_id: 1,
-                is_active: 1,
             };
 
             const url = "http://localhost:2000/product/"+product_id;
@@ -67,11 +67,12 @@ export const EditProductForm = () => {
             document.getElementById("price").value = "";
             document.getElementById("stock").value = "";
             document.getElementById("image").value = "";
+            document.getElementById("is_active").value = "";
             document.getElementById("category_id").value = "";
 
             setTimeout(() => {
-                navigate("/");
-            }, 1500);
+                navigate(-1);
+            }, 500);
         } catch (err) {
             console.log(err);
         }
@@ -87,7 +88,7 @@ export const EditProductForm = () => {
             <Stack spacing={8} mx={"auto"} maxW={"lg"} py={12} px={6} w={500}>
                 <Stack align={"center"}>
                     <Heading fontSize={"4xl"} textAlign={"center"}>
-                        Add Product
+                        Edit Product
                     </Heading>
                 </Stack>
                 <Box
@@ -118,9 +119,21 @@ export const EditProductForm = () => {
                                 <FormLabel>Image</FormLabel>
                                 <Input type="text" defaultValue={productValue.image}/>
                             </FormControl>
-                            <Select id="category_id" placeholder="Select Category" isRequired>
-                                {optionList}
-                            </Select>
+                            <FormControl isRequired>
+                                <FormLabel>Is Active?</FormLabel>
+                                <Select id="is_active" placeholder="is Active?">
+                                    {productValue.is_active == 1 ? (<option value="1" selected>Active</option>) : (<option value="1">Active</option>)}
+                                    {productValue.is_active == 0 ? (<option value="0" selected>Inactive</option>) : (<option value="0">Inactive</option>)}
+                                </Select>
+                            </FormControl>
+
+                            <FormControl isRequired>
+                                <FormLabel>Category</FormLabel>
+                                <Select id="category_id" placeholder="Select Category">
+                                    {optionList}
+                                </Select>
+                            </FormControl>
+                            
                             <Link
                                     color={"blue.400"}
                                     onClick={() => navigate("/add-category")}
@@ -138,7 +151,7 @@ export const EditProductForm = () => {
                                 }}
                                 variant="solid"
                                 color="white"
-                                onClick={addProduct}
+                                onClick={editProduct}
                             >
                                 Done
                             </Button>
@@ -147,9 +160,9 @@ export const EditProductForm = () => {
                             <Text align={"center"}>
                                 <Link
                                     color={"blue.400"}
-                                    onClick={() => navigate("/")}
+                                    onClick={() => navigate(-1)}
                                 >
-                                    Back to home
+                                    Back
                                 </Link>
                             </Text>
                         </Stack>

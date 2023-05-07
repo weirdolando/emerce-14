@@ -31,8 +31,8 @@ export const AddCategoryForm = () => {
             document.getElementById("name").value = "";
 
             setTimeout(() => {
-                navigate("/add-product");
-            }, 1500);
+                navigate(-1);
+            }, 500);
         } catch (err) {
             console.log(err);
         }
@@ -83,7 +83,7 @@ export const AddCategoryForm = () => {
                             <Text align={"center"}>
                                 <Link
                                     color={"blue.400"}
-                                    onClick={() => navigate("/add-product")}
+                                    onClick={() => navigate(-1)}
                                 >
                                     Back
                                 </Link>

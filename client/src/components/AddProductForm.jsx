@@ -56,8 +56,8 @@ export const AddProductForm = () => {
             document.getElementById("category_id").value = "";
 
             setTimeout(() => {
-                navigate("/");
-            }, 1500);
+                navigate(-1);
+            }, 500);
         } catch (err) {
             console.log(err);
         }
@@ -104,9 +104,12 @@ export const AddProductForm = () => {
                                 <FormLabel>Image</FormLabel>
                                 <Input type="text" />
                             </FormControl>
-                            <Select id="category_id" placeholder="Select Category" isRequired>
-                                {optionList}
-                            </Select>
+                            <FormControl isRequired>
+                                <FormLabel>Category</FormLabel>
+                                <Select id="category_id" placeholder="Select Category">
+                                    {optionList}
+                                </Select>
+                            </FormControl>
                             <Link
                                     color={"blue.400"}
                                     onClick={() => navigate("/add-category")}
@@ -133,9 +136,9 @@ export const AddProductForm = () => {
                             <Text align={"center"}>
                                 <Link
                                     color={"blue.400"}
-                                    onClick={() => navigate("/")}
+                                    onClick={() => navigate(-1)}
                                 >
-                                    Back to home
+                                    Back
                                 </Link>
                             </Text>
                         </Stack>
