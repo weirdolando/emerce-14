@@ -37,6 +37,7 @@ function App() {
         <Route path="/edit-product/:id" element={<EditProductForm/>} />
         <Route path="/edit-category/:id" element={<EditCategoryForm/>} />
         <Route path="/dashboard" element={<DashboardProduct/>} />
+        <Route path="/store" element={<StorePage/>} />
         <Route path="/category" element={<CategoryList/>} />
       </Routes>
     </div>
