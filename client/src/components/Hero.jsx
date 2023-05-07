@@ -41,7 +41,7 @@ function Hero({ onChange, currPage, setCurrPage, product }) {
         alignItems={"center"}
         gap={4}
       >
-        {product.products.map((product, idx) => {
+        {product.products?.map((product, idx) => {
           return (
             product["is_active"] && (
               <GridItem key={product.id}>

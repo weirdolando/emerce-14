@@ -114,7 +114,77 @@ module.exports = {
       }
     );
   },
-
+  async getStoreProducts(req, res) {
+    const page = req.query.page || 1;
+    const categoryId = req.query.categoryId;
+    const userId = req.user.id;
+    if (!userId)
+      return res.status(400).json({ error: "Required field cannot be empty" });
+    try {
+      const [store] = await db
+        .promise()
+        .query("SELECT id FROM stores WHERE user_id = ?", userId);
+      if (!store.length)
+        return res.status(404).json({ error: "Store not found" });
+      const storeId = store[0].id;
+      if (categoryId) {
+        const [products] = await db
+          .promise()
+          .query(
+            "SELECT * FROM products WHERE store_id = ? AND category_id = ? ORDER BY sold DESC LIMIT 9 OFFSET ?",
+            [storeId, categoryId, (page - 1) * 9]
+          );
+        return res.status(200).json({ status: 200, data: products });
+      }
+      const [products] = await db
+        .promise()
+        .query(
+          "SELECT * FROM products WHERE store_id = ? ORDER BY sold DESC LIMIT 9 OFFSET ?",
+          [storeId, (page - 1) * 9]
+        );
+      return res.status(200).json({ status: 200, data: products });
+    } catch (err) {
+      console.log(err.message);
+      return res.status(400).json({ error: err.message });
+    }
+  },
+  async getTotalStoreProducts(req, res) {
+    const categoryId = req.query.categoryId;
+    const userId = req.user.id;
+    if (!userId)
+      return res.status(400).json({ error: "Required field cannot be empty" });
+    try {
+      const [store] = await db
+        .promise()
+        .query("SELECT id FROM stores WHERE user_id = ?", userId);
+      if (!store.length)
+        return res.status(404).json({ error: "Store not found" });
+      const storeId = store[0].id;
+      if (categoryId) {
+        const [products] = await db
+          .promise()
+          .query(
+            "SELECT COUNT(*) AS total_products FROM products WHERE store_id = ? AND category_id = ?",
+            [storeId, categoryId]
+          );
+        return res
+          .status(200)
+          .json({ status: 200, total_products: products[0].total_products });
+      }
+      const [products] = await db
+        .promise()
+        .query(
+          "SELECT COUNT(*) AS total_products FROM products WHERE store_id = ?",
+          storeId
+        );
+      return res
+        .status(200)
+        .json({ status: 200, total_products: products[0].total_products });
+    } catch (err) {
+      console.log(err.message);
+      return res.status(400).json({ error: err.message });
+    }
+  },
   getProductDetail: (req, res) => {
     db.query(
       `select * from products where id = ${req.params.id}`,
@@ -169,7 +239,7 @@ module.exports = {
   },
 
   addCategory: (req, res) => {
-    const {category_name} = req.body
+    const { category_name } = req.body;
     db.query(
       `insert into categories(category) values
             (${db.escape(category_name)});`,
@@ -181,7 +251,6 @@ module.exports = {
         });
       }
     );
-
   },
 
   editProduct: (req, res) => {

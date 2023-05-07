@@ -19,6 +19,8 @@ async function getUserTransactions(req, res) {
   dateStart += " 00:00:00";
   dateEnd += " 23:59:59";
   const userId = req.user.id;
+  if (!userId)
+    return res.status(400).json({ error: "Required field cannot be empty" });
 
   try {
     const [transactions] = await db.promise().query(
@@ -74,6 +76,79 @@ async function getTotalUserTransactions(req, res) {
     return res
       .status(200)
       .json({ total_transactions: transactions[0].total_transactions });
+  } catch (err) {
+    console.log(err.message);
+    return res.status(400).json({ error: err.message });
+  }
+}
+
+async function getStoreTransactions(req, res) {
+  let dateStart = req.query.start;
+  let dateEnd = req.query.end;
+  const page = req.query.page || 1;
+  if (!dateStart || !dateEnd) {
+    const date = new Date();
+    // Slice until 10 because I only need the date and not the timestamp.
+    dateEnd = date.toISOString().slice(0, 10).replace("T", " ");
+    date.setDate(date.getDate() - 7);
+    dateStart = date.toISOString().slice(0, 10).replace("T", " ");
+  }
+  /**
+   * Note: the timestamp is important, because if we only include the date,
+   * e.g. 2023-05-04, it will consider it as 2023-05-04 00:00:00 which is
+   * at midnight before that day even starts.
+   * */
+  dateStart += " 00:00:00";
+  dateEnd += " 23:59:59";
+  const storeId = req.params.id;
+
+  // * I remove pagination because I don't use it in frontend. Feel free to add if you need to
+  // * Add LIMIT 9 OFFSET {(page - 1) * 9} to the query
+  try {
+    const [transactions] = await db.promise().query(
+      `SELECT t.total
+        FROM transaction_details td
+        JOIN transactions t
+        ON td.transaction_id = t.id
+        WHERE td.store_id = ?
+        AND t.date BETWEEN ? AND ?
+        GROUP BY t.id
+        ORDER BY date DESC`,
+      [storeId, dateStart, dateEnd]
+    );
+    return res.status(200).json({ transactions });
+  } catch (err) {
+    console.log(err.message);
+    return res.status(400).json({ error: err.message });
+  }
+}
+
+// * Just in case I changed my mind and want to use pagination
+async function getTotalStoreTransactions(req, res) {
+  let dateStart = req.query.start;
+  let dateEnd = req.query.end;
+  if (!dateStart || !dateEnd) {
+    const date = new Date();
+    dateEnd = date.toISOString().slice(0, 10).replace("T", " ");
+    date.setDate(date.getDate() - 7);
+    dateStart = date.toISOString().slice(0, 10).replace("T", " ");
+  }
+  dateStart += " 00:00:00";
+  dateEnd += " 23:59:59";
+  const storeId = req.params.id;
+
+  try {
+    const [transactions] = await db.promise().query(
+      `SELECT t.id
+        FROM transaction_details td
+        JOIN transactions t
+        ON td.transaction_id = t.id
+        WHERE td.store_id = ?
+        AND t.date BETWEEN ? AND ?
+        GROUP BY t.id`,
+      [storeId, dateStart, dateEnd]
+    );
+    return res.status(200).json({ total_transactions: transactions.length });
   } catch (err) {
     console.log(err.message);
     return res.status(400).json({ error: err.message });
@@ -178,5 +253,7 @@ async function addTransactions(req, res) {
 module.exports = {
   getUserTransactions,
   getTotalUserTransactions,
+  getStoreTransactions,
+  getTotalStoreTransactions,
   addTransactions,
 };

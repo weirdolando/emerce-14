@@ -26,7 +26,6 @@ export const AddProductForm = () => {
         const categoryList = await axios.get(url);
         setCategories(categoryList.data.data)
     }
-
     fetchCategories();
 
     const optionList = categories.map((item) => <option value={item.id}>{item.category}</option>);

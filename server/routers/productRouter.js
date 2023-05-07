@@ -1,5 +1,7 @@
-const router = require("express").Router()
-const { productController } = require("../controllers")
+const router = require("express").Router();
+const { productController } = require("../controllers");
+const userExtractor = require("../middleware/userExtractor");
+
 
 router.get("/", productController.getProduct)
 router.get("/total", productController.getTotalProduct)
@@ -13,6 +15,7 @@ router.post("/category", productController.addCategory)
 router.patch("/category/:id", productController.editCategory)
 router.patch("/:id", productController.editProduct)
 
-router.delete("/:id", productController.deactivateProduct)
 
-module.exports = router
+router.delete("/:id", productController.deactivateProduct);
+
+module.exports = router;
